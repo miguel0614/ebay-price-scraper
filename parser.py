@@ -1,34 +1,48 @@
 import requests
 from bs4 import BeautifulSoup
+from multiprocessing import Pool
+import pandas as pd
 
 
-# url = "https://www.ebay.com/sch/i.html?from=R40&_nkw={}&LH_Sold=1&LH_Complete=1&_ipg=200&_pgn=1".format(input("Input Search Parameter: "))
+def format_url(name, sold, comp, low, high, condition):
+    base_url = "https://www.ebay.com/sch/i.html?from=R40&_nkw={name}&LH_Sold={sold}&LH_Complete={comp}&_ipg=200&_udlo={low}&_udhi={high}&LH_ItemCondition={condition}".format(
+        name=name, sold=sold, comp=comp, low=low, high=high, condition=condition)
+    print(base_url)
+    return base_url
 
 
-def find_sold(url):
+def generate_urls(url):
+    urls = list()
     content = requests.get(url).content
-    soup = BeautifulSoup(content, 'html.parser')
-    ret = []
+    soup = BeautifulSoup(content, 'html5lib')
     try:
-        for page in range(int(soup.find_all("li", attrs={"class": "x-pagination__li"})[-1].text)):
-            result = soup.find_all("span", attrs={"class": "POSITIVE"})
-            data = [float(x.text.lstrip('$').replace(',', "")) for x in result if x.text[0] == '$']
-            ret.extend(data)
-
+        urls = [url + "&_pgn=" + str(page_num) for page_num in
+                range(1, int(soup.find_all("li", attrs={"class": "x-pagination__li"})[-1].text) + 1)]
     except IndexError:
-        result = soup.find_all("span", attrs={"class": "POSITIVE"})
-        data = [float(x.text.lstrip('$').replace(',', "")) for x in result if x.text[0] == '$']
-        ret.extend(data)
+        print("Only 1 Page of Results Available")
+        urls.append(url)
     finally:
-        return ret
+        return urls
 
 
-def find_current(url):
-    pass
+def scrape(url):
+    content = requests.get(url).content
+    soup = BeautifulSoup(content, 'html5lib')
+    if "&LH_Sold=1" in url:
+        result = soup.find_all("span", attrs={"class": "POSITIVE"})
+        parsed = [float(x.text.lstrip('$').replace(',', "")) for x in result if x.text[0] == '$']
+    else:
+        result = soup.find_all("span", attrs={"class": "s-item__price"})
+        parsed = [float(x.text.lstrip('$').replace(',', "")) for x in result if x.text[0] == '$' and 'to' not in x.text]
+    return parsed
 
 
-def format_url():
-    pass
+def process_data(url):
+    urls = generate_urls(url)
+    with Pool(len(urls)) as p:
+        data = p.map(scrape, urls)
+    return [cost for page in data for cost in page]
 
 
-print(len(find_sold("https://www.ebay.com/sch/i.html?from=R40&_nkw=iphone+8&LH_Sold=1&LH_Complete=1&_ipg=200&_pgn=1&LH_ItemCondition=1000&_udlo=500&_udhi=1000")))
+if __name__ == '__main__':
+    print(len(process_data(format_url("samsung", "0", "0", "300", "600", ''))))

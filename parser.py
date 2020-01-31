@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 from multiprocessing import Pool
+import pandas as pd
 
 
 def format_url(name, sold, comp, low, high, condition):
@@ -27,8 +28,12 @@ def generate_urls(url):
 def scrape(url):
     content = requests.get(url).content
     soup = BeautifulSoup(content, 'html5lib')
-    result = soup.find_all("span", attrs={"class": "POSITIVE"})
-    parsed = [float(x.text.lstrip('$').replace(',', "")) for x in result if x.text[0] == '$']
+    if "&LH_Sold=1" in url:
+        result = soup.find_all("span", attrs={"class": "POSITIVE"})
+        parsed = [float(x.text.lstrip('$').replace(',', "")) for x in result if x.text[0] == '$']
+    else:
+        result = soup.find_all("span", attrs={"class": "s-item__price"})
+        parsed = [float(x.text.lstrip('$').replace(',', "")) for x in result if x.text[0] == '$' and 'to' not in x.text]
     return parsed
 
 
@@ -40,4 +45,4 @@ def process_data(url):
 
 
 if __name__ == '__main__':
-    print(len(process_data(format_url("iphone", "1", "1", "300", "600", ''))))
+    print(len(process_data(format_url("samsung", "0", "0", "300", "600", ''))))

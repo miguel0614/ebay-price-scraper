@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<title>Ebay Product Lookup</title>
+<head>
+<script src='../static/script.js'></script>
+  <link rel="shortcut icon" type="image/x-icon" href="/static/Mercury.ico" />
+</head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+<style>
+body,h1 {font-family: "Raleway", sans-serif}
+body, html {height: 100%}
+.bgimg {
+  background-image: url('https://i.ibb.co/SsjqHFX/bg-signup.jpg');
+  min-height: 100%;
+  background-position: center;
+  background-size: cover;
+}
+</style>
+<body>
+
+<div class="bgimg w3-display-container w3-animate-opacity w3-text-white">
+  <div class="w3-display-topleft w3-padding-large w3-xlarge">
+    A Tool Made For Ebay
+  </div>
+  <div style="padding:40px; background: rgba(64,64,64,.5); border: #000000 2px solid" class="w3-display-middle"><div style="text-align: center;">
+    <h1 class="w3-jumbo w3-animate-top">Ebay Product Lookup</h1>
+    </div>
+    <hr class="w3-border-grey" style="margin:auto;width:40%">
+    <p class="w3-large w3-center">Enter an item below for price data</p>
+    <div style="text-align: center;">
+      <form id="search"  action="/search" onsubmit="return validateForm()" method="post">
+        <label for='product'>Product: </label><input id='product' style="border-radius: 5px; opacity: 65%;" type="text" name="product">
+        <br><br><label for="condition">Condition: </label> <select style="border-radius: 5px; opacity: 65%;" id="condition">
+  <option value="new">New</option>
+  <option value="open">Open Box</option>
+  <option value="manufacturer">Manufacturer Refurbished </option>
+  <option value="seller">Seller Refurbished</option>
+  <option value="used">Used</option>
+  <option value="parts">For Parts or Not Working</option>
+</select> <br><br>
+        Item Status:
+        <input type="radio" name="sold" id="active" value="Active" checked> <label for="active">Active</label>
+        <input type="radio" name="sold" id="sold" value="Sold"> <label for="sold">Sold</label> <br><br>
+        <label for="price-min">Price Range: </label><input id='price-min' min= 0 style="border-radius: 5px; width: 40px; opacity: 65%;" type="number" name="price-min">
+        <label for="price-max">    to:    </label><input id='price-max' min = 0 style="border-radius: 5px; width: 40px; opacity: 65%;" type="number" name="price-max">
+      </form>
+
+
+  </div>
+  </div>
+  <div class="w3-display-bottomleft w3-padding-large">
+    Click here to login
+  </div>
+</div>
+
+</body>
+</html>

@@ -6,6 +6,8 @@ import pandas as pd
 
 # Adds in search parameters
 def format_url(name, sold, comp, low, high, condition):
+    if " " in name.strip():
+        name = '+'.join(name.split())
     base_url = f"https://www.ebay.com/sch/i.html?from=R40&_nkw={name}&LH_Sold={sold}&LH_Complete={comp}&_ipg=200&_udlo={low}&_udhi={high}&LH_ItemCondition={condition}"
     print(base_url)
     return base_url
